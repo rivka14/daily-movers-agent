@@ -1,0 +1,22 @@
+{
+  "stocks": [
+    {
+      "ticker": "NVDA",
+      "company_name": "NVIDIA",
+      "price": 875.50,
+      "change_percent": 5.2,
+      "volume": 45000000
+    },
+    {
+      "ticker": "TSLA",
+      "company_name": "Tesla",
+      "price": 245.30,
+      "change_percent": -3.1,
+      "volume": 32000000
+    }
+  ],
+  "current_index": 0,
+  "research_results": [],
+  "analysis_results": [],
+  "recommendations": []
+}
