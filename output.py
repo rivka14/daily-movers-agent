@@ -18,8 +18,11 @@ SUMMARY_HEADERS = [
     "Ticker",
     "Company",
     "Price ($)",
+    "Change ($)",
     "Change (%)",
     "Volume",
+    "Market Cap",
+    "P/E Ratio",
     "Sentiment",
     "Recommendation",
     "Confidence",
@@ -30,8 +33,15 @@ RAW_HEADERS = [
     "Ticker",
     "Company",
     "Price",
+    "Change",
     "Change_Pct",
     "Volume",
+    "Avg_Vol_3M",
+    "Market_Cap",
+    "PE_Ratio",
+    "Week_52_Change_Pct",
+    "Week_52_Low",
+    "Week_52_High",
     "News_Summary",
     "Key_Events",
     "Technical_Analysis",
@@ -109,8 +119,11 @@ def _build_summary_sheet(
             ticker,
             stock["company_name"],
             stock["price"],
+            stock["change"],
             stock["change_percent"],
             stock["volume"],
+            stock["market_cap"],
+            stock["pe_ratio"] if stock["pe_ratio"] is not None else "—",
             analysis.get("sentiment", "—"),
             rec.get("action", "—"),
             rec.get("confidence", "—"),
@@ -118,7 +131,7 @@ def _build_summary_sheet(
         ]
         for col_idx, val in enumerate(values, start=1):
             cell = ws.cell(row=row, column=col_idx, value=val)
-            if col_idx in (3, 4, 5, 8):
+            if col_idx in (3, 4, 5, 6, 8, 11):
                 cell.alignment = CENTER
             else:
                 cell.alignment = LEFT
@@ -136,7 +149,7 @@ def _build_summary_sheet(
             for col_idx in range(1, len(SUMMARY_HEADERS) + 1):
                 ws.cell(row=row, column=col_idx).fill = fill
 
-    widths = [10, 18, 12, 12, 16, 12, 16, 12, 40]
+    widths = [10, 22, 12, 12, 12, 16, 14, 12, 12, 16, 12, 40]
     for i, w in enumerate(widths, start=1):
         col_letter = chr(64 + i)
         ws.column_dimensions[col_letter].width = w
@@ -169,8 +182,15 @@ def _build_raw_sheet(
             ticker,
             stock["company_name"],
             stock["price"],
+            stock["change"],
             stock["change_percent"],
             stock["volume"],
+            stock["avg_volume_3m"],
+            stock["market_cap"],
+            stock["pe_ratio"],
+            stock["week_52_change_pct"],
+            stock["week_52_low"],
+            stock["week_52_high"],
             research.get("news_summary", ""),
             "; ".join(research.get("key_events", [])),
             analysis.get("technical_analysis", ""),
