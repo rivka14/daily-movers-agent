@@ -4,6 +4,8 @@
 # Python
 /venv
 __pycache__/
+.pytest_cache/
+.benchmarks/
 
 # Environment
 .env
@@ -11,6 +13,7 @@ __pycache__/
 # Project
 CLAUDE.md
 .claude/
+docs/
 
 # Generated reports
 *.xlsx
