@@ -66,16 +66,19 @@ def analyst_node(state: AgentState) -> dict:
     stock = _current_stock(state)
     research = state["research_results"][-1]
 
+    pe_str = f"{stock['pe_ratio']:.2f}" if stock["pe_ratio"] is not None else "N/A"
     prompt = (
         f"You are a financial analyst. Analyse the following data for {stock['ticker']} "
         f"({stock['company_name']}).\n\n"
-        f"Stock price: ${stock['price']}, Change: {stock['change_percent']}%, "
-        f"Volume: {stock['volume']:,}\n\n"
+        f"Price: ${stock['price']:.2f}  |  Change: ${stock['change']:+.2f} ({stock['change_percent']:+.2f}%)\n"
+        f"Volume: {stock['volume']:,}  |  Avg Vol (3M): {stock['avg_volume_3m']:,}\n"
+        f"Market Cap: {stock['market_cap']}  |  P/E (TTM): {pe_str}\n"
+        f"52-Week Range: ${stock['week_52_low']:.2f} – ${stock['week_52_high']:.2f}  |  52W Chg: {stock['week_52_change_pct']:+.2f}%\n\n"
         f"News summary: {research['news_summary']}\n"
         f"Key events: {research['key_events']}\n\n"
         f"Produce a JSON object with exactly these keys:\n"
         f'  "ticker": "{stock["ticker"]}",\n'
-        f'  "technical_analysis": "<2-3 sentences on price action, volume, momentum>",\n'
+        f'  "technical_analysis": "<2-3 sentences on price action, volume, momentum, and valuation>",\n'
         f'  "sentiment": "<one of: positive, negative, neutral>"\n\n'
         f"Return only the JSON object, no additional text."
     )
@@ -96,17 +99,20 @@ def strategist_node(state: AgentState) -> dict:
     stock = _current_stock(state)
     analysis = state["analysis_results"][-1]
 
+    pe_str = f"{stock['pe_ratio']:.2f}" if stock["pe_ratio"] is not None else "N/A"
     prompt = (
         f"You are a senior investment strategist. Based on the following analysis for "
         f"{stock['ticker']} ({stock['company_name']}) make a recommendation.\n\n"
-        f"Price: ${stock['price']}, Change: {stock['change_percent']}%, "
-        f"Volume: {stock['volume']:,}\n"
+        f"Price: ${stock['price']:.2f}  |  Change: ${stock['change']:+.2f} ({stock['change_percent']:+.2f}%)\n"
+        f"Market Cap: {stock['market_cap']}  |  P/E (TTM): {pe_str}\n"
+        f"52-Week Range: ${stock['week_52_low']:.2f} – ${stock['week_52_high']:.2f}  |  52W Chg: {stock['week_52_change_pct']:+.2f}%\n"
+        f"Volume: {stock['volume']:,}  |  Avg Vol (3M): {stock['avg_volume_3m']:,}\n\n"
         f"Technical analysis: {analysis['technical_analysis']}\n"
         f"Sentiment: {analysis['sentiment']}\n\n"
         f"Produce a JSON object with exactly these keys:\n"
         f'  "ticker": "{stock["ticker"]}",\n'
         f'  "action": "<one of: Buy, Hold, Sell>",\n'
-        f'  "reasoning": "<2-3 sentences justifying the recommendation>",\n'
+        f'  "reasoning": "<2-3 sentences justifying the recommendation, referencing valuation and momentum>",\n'
         f'  "confidence": <float between 0.0 and 1.0>\n\n'
         f"Return only the JSON object, no additional text."
     )
