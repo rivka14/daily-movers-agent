@@ -114,3 +114,16 @@ The agent processes all 20 stocks and writes two files to the working directory:
 | `input.json` | Sample input — 20 stocks with all Yahoo Finance fields |
 | `langgraph.json` | LangGraph deployment entry point |
 | `tests/` | Unit tests for state schema and output highlight logic |
+
+---
+
+## Optional Improvements
+
+### Agent Evaluation
+The pipeline currently produces recommendations without measuring their quality over time. An eval layer would close that loop:
+- **Confidence calibration** — bucket recommendations by the strategist's `confidence` score and check whether high-confidence calls actually outperform low-confidence ones.
+- **LLM-as-judge** — have a separate Gemini call score each analyst output for reasoning coherence and factual consistency against the research summary, without needing ground-truth labels.
+- **Regression suite** — store a small set of known inputs and their expected recommendation outputs so that model or prompt changes don't silently degrade quality.
+
+### Other ideas
+- **Cost tracking** — log token usage per stock so the per-run cost is visible and can be optimised.
