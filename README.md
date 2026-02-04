@@ -83,36 +83,65 @@ This is the interface between UiPath and the agent. UiPath writes it after scrap
 
 ## Setup
 
-1. Copy `.env.example` → `.env`. Fill in `GOOGLE_API_KEY` (Gemini) and `SERPER_API_KEY`.
-2. `pip install -e .`
-3. `uipath init` (generates `entry-points.json` for cloud deployment).
+1. **Install dependencies**
+   ```bash
+   pip install -e .
+   ```
+
+2. **Configure environment**
+   - Copy `.env.example` → `.env`
+   - Fill in `GOOGLE_API_KEY` (for Gemini) and `SERPER_API_KEY`
+
+3. **Authenticate with UiPath**
+   ```bash
+   uipath auth
+   ```
+   This opens a browser for OAuth authentication with UiPath Cloud Platform.
+
+4. **Initialize UiPath project** (optional, for cloud deployment)
+   ```bash
+   uipath init
+   ```
 
 ## Running
 
-### With UiPath (production)
-UiPath scrapes Yahoo Finance and invokes the agent automatically.
+### Via UiPath CLI (recommended)
 
-### Locally (debug)
+The agent is designed to run through UiPath's workflow automation:
+
 ```bash
-# input.json is already populated with sample data — run directly:
+# First, scrape the latest stock data:
+python scraper.py
+
+# Then run the agent with the scraped data:
 uipath run agent --file input.json
 ```
 
-The agent processes all 20 stocks and writes two files to the working directory:
-- `daily_movers_report_YYYYMMDD.xlsx` — full two-sheet workbook
-- `daily_movers_summary_YYYYMMDD.txt` — plain-text digest
+**Output:** The agent processes all stocks and generates:
+- `daily_movers_report_YYYYMMDD.xlsx` — full two-sheet workbook with highlights
+- `daily_movers_summary_YYYYMMDD.txt` — plain-text executive digest
+
+### With UiPath Robot (production)
+
+In production, a UiPath Robot orchestrates the full workflow:
+1. Scrapes Yahoo Finance Most Active stocks
+2. Writes `input.json` with stock data
+3. Triggers the agent via `uipath run agent --file input.json`
+4. Delivers the Excel report and summary to stakeholders
 
 ## Key Files
 
 | File | Role |
 |---|---|
-| `state.py` | TypedDict schemas — `StockData`, `AgentState`, etc. |
-| `agents.py` | LLM nodes: research, analyst, strategist, supervisor |
-| `graph.py` | LangGraph wiring and conditional loop routing |
+| `state.py` | Pydantic schemas — `StockData`, `State`, `Input`, `Output` |
+| `agents.py` | LLM nodes: research, analyst, strategist, supervisor (uses UiPathChat) |
+| `main.py` | LangGraph wiring and conditional loop routing |
+| `scraper.py` | Yahoo Finance scraper using yfinance library |
 | `output.py` | Excel workbook builder and plain-text summary writer |
 | `tools.py` | Google Serper search wrapper |
-| `input.json` | Sample input — 20 stocks with all Yahoo Finance fields |
+| `input.json` | Sample input — stock data with all Yahoo Finance fields |
 | `langgraph.json` | LangGraph deployment entry point |
+| `uipath.json` | UiPath project configuration |
 | `tests/` | Unit tests for state schema and output highlight logic |
 
 ---
