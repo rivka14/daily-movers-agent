@@ -6,8 +6,15 @@ class StockData(TypedDict):
     ticker: str
     company_name: str
     price: float
+    change: float                # absolute $ change
     change_percent: float
     volume: int
+    avg_volume_3m: int
+    market_cap: str              # e.g. "4.391T", "39.925B"
+    pe_ratio: float | None       # None when Yahoo shows "--"
+    week_52_change_pct: float
+    week_52_low: float
+    week_52_high: float
 
 
 class ResearchResult(TypedDict):
