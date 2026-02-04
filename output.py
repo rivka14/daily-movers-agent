@@ -281,4 +281,9 @@ def generate_email_node(state: AgentState) -> dict:
     lines.append(f"Full details in: {state['excel_path'] or 'report not generated'}")
 
     email_text = "\n".join(lines)
+
+    summary_filename = f"daily_movers_summary_{date.today().strftime('%Y%m%d')}.txt"
+    with open(summary_filename, "w") as f:
+        f.write(email_text)
+
     return {"email_summary": email_text}
