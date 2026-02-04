@@ -1,22 +1,30 @@
 {
   "stocks": [
-    {
-      "ticker": "NVDA",
-      "company_name": "NVIDIA",
-      "price": 875.50,
-      "change_percent": 5.2,
-      "volume": 45000000
-    },
-    {
-      "ticker": "TSLA",
-      "company_name": "Tesla",
-      "price": 245.30,
-      "change_percent": -3.1,
-      "volume": 32000000
-    }
+    { "ticker": "NVDA",  "company_name": "NVIDIA Corporation",              "price": 180.35, "change": -5.26,  "change_percent": -2.83,  "volume": 182108000, "avg_volume_3m": 181311000, "market_cap": "4.391T",  "pe_ratio": 47.31,  "week_52_change_pct": 48.69,   "week_52_low": 86.62,  "week_52_high": 196.95 },
+    { "ticker": "PYPL",  "company_name": "PayPal Holdings, Inc.",           "price": 41.70,  "change": -10.63, "change_percent": -20.31, "volume": 134444000, "avg_volume_3m": 15548000,  "market_cap": "39.925B", "pe_ratio": 10.58,  "week_52_change_pct": -33.93,  "week_52_low": 37.50,  "week_52_high": 65.20  },
+    { "ticker": "PLTR",  "company_name": "Palantir Technologies, Inc.",     "price": 157.88, "change": 10.11,  "change_percent": 6.84,   "volume": 107996000, "avg_volume_3m": 43593000,  "market_cap": "376.297B","pe_ratio": 339.54, "week_52_change_pct": 45.78,   "week_52_low": 66.12,  "week_52_high": 167.00 },
+    { "ticker": "INTC",  "company_name": "Intel Corporation",               "price": 49.25,  "change": 0.46,   "change_percent": 0.94,   "volume": 101489000, "avg_volume_3m": 99915000,  "market_cap": "246.013B","pe_ratio": null,   "week_52_change_pct": 148.40,  "week_52_low": 17.67,  "week_52_high": 53.20  },
+    { "ticker": "PLUG",  "company_name": "Plug Power Inc.",                 "price": 2.13,   "change": 0.05,   "change_percent": 2.40,   "volume": 99745000,  "avg_volume_3m": 105741000, "market_cap": "2.964B",  "pe_ratio": null,   "week_52_change_pct": 12.43,   "week_52_low": 0.69,   "week_52_high": 3.48   },
+    { "ticker": "ONDS",  "company_name": "Ondas Inc.",                      "price": 11.38,  "change": 0.74,   "change_percent": 6.95,   "volume": 96529000,  "avg_volume_3m": 102757000, "market_cap": "4.827B",  "pe_ratio": null,   "week_52_change_pct": 548.78,  "week_52_low": 0.57,   "week_52_high": 12.50  },
+    { "ticker": "SOFI",  "company_name": "SoFi Technologies, Inc.",         "price": 21.76,  "change": -0.32,  "change_percent": -1.45,  "volume": 86776000,  "avg_volume_3m": 58502000,  "market_cap": "27.497B", "pe_ratio": 59.15,  "week_52_change_pct": 42.54,   "week_52_low": 8.60,   "week_52_high": 24.85  },
+    { "ticker": "PFE",   "company_name": "Pfizer Inc.",                     "price": 25.77,  "change": -0.89,  "change_percent": -3.34,  "volume": 73415000,  "avg_volume_3m": 58902000,  "market_cap": "146.521B","pe_ratio": 15.37,  "week_52_change_pct": 0.83,    "week_52_low": 20.92,  "week_52_high": 28.94  },
+    { "ticker": "CADE",  "company_name": "Cadence Bank",                   "price": 42.11,  "change": -0.71,  "change_percent": -1.66,  "volume": 80318000,  "avg_volume_3m": 3994000,   "market_cap": "7.845B",  "pe_ratio": 14.88,  "week_52_change_pct": 19.19,   "week_52_low": 25.22,  "week_52_high": 44.50  },
+    { "ticker": "DNN",   "company_name": "Denison Mines Corp.",             "price": 4.10,   "change": 0.32,   "change_percent": 8.47,   "volume": 74409000,  "avg_volume_3m": 51433000,  "market_cap": "3.679B",  "pe_ratio": null,   "week_52_change_pct": 103.23,  "week_52_low": 1.08,   "week_52_high": 5.49   },
+    { "ticker": "SNAP",  "company_name": "Snap Inc.",                       "price": 6.10,   "change": -0.56,  "change_percent": -8.41,  "volume": 73573000,  "avg_volume_3m": 45128000,  "market_cap": "10.488B", "pe_ratio": null,   "week_52_change_pct": -37.35,  "week_52_low": 5.85,   "week_52_high": 14.86  },
+    { "ticker": "F",     "company_name": "Ford Motor Company",              "price": 13.73,  "change": -0.08,  "change_percent": -0.58,  "volume": 71369000,  "avg_volume_3m": 57653000,  "market_cap": "54.707B", "pe_ratio": 11.86,  "week_52_change_pct": 37.96,   "week_52_low": 8.44,   "week_52_high": 15.36  },
+    { "ticker": "BBAI",  "company_name": "BigBear.ai Holdings, Inc.",       "price": 4.95,   "change": 0.17,   "change_percent": 3.56,   "volume": 69376000,  "avg_volume_3m": 92401000,  "market_cap": "2.267B",  "pe_ratio": null,   "week_52_change_pct": -32.77,  "week_52_low": 2.36,   "week_52_high": 12.50  },
+    { "ticker": "OWL",   "company_name": "Blue Owl Capital Inc.",           "price": 12.11,  "change": -1.31,  "change_percent": -9.76,  "volume": 68636000,  "avg_volume_3m": 13531000,  "market_cap": "18.931B", "pe_ratio": 175.92, "week_52_change_pct": -46.21,  "week_52_low": 11.85,  "week_52_high": 25.68  },
+    { "ticker": "NVO",   "company_name": "Novo Nordisk A/S",                "price": 50.30,  "change": -8.63,  "change_percent": -14.64, "volume": 67180000,  "avg_volume_3m": 20551000,  "market_cap": "223.507B","pe_ratio": 15.84,  "week_52_change_pct": -31.26,  "week_52_low": 43.08,  "week_52_high": 84.96  },
+    { "ticker": "BTG",   "company_name": "B2Gold Corp.",                    "price": 5.02,   "change": 0.13,   "change_percent": 2.66,   "volume": 65512000,  "avg_volume_3m": 38833000,  "market_cap": "6.707B",  "pe_ratio": 31.57,  "week_52_change_pct": 91.76,   "week_52_low": 2.47,   "week_52_high": 5.79   },
+    { "ticker": "WULF",  "company_name": "TeraWulf Inc.",                   "price": 14.80,  "change": 1.36,   "change_percent": 10.12,  "volume": 61840000,  "avg_volume_3m": 31823000,  "market_cap": "6.196B",  "pe_ratio": null,   "week_52_change_pct": 165.09,  "week_52_low": 2.06,   "week_52_high": 18.56  },
+    { "ticker": "OPEN",  "company_name": "Opendoor Technologies, Inc.",     "price": 5.13,   "change": 0.31,   "change_percent": 6.43,   "volume": 61660000,  "avg_volume_3m": 87618000,  "market_cap": "4.893B",  "pe_ratio": null,   "week_52_change_pct": 249.28,  "week_52_low": 0.51,   "week_52_high": 6.58   },
+    { "ticker": "SAN",   "company_name": "Banco Santander, S.A.",           "price": 12.23,  "change": -0.83,  "change_percent": -6.36,  "volume": 60995000,  "avg_volume_3m": 3130000,   "market_cap": "180.851B","pe_ratio": 12.83,  "week_52_change_pct": 132.38,  "week_52_low": 5.51,   "week_52_high": 13.50  },
+    { "ticker": "GRAB",  "company_name": "Grab Holdings Limited",           "price": 4.27,   "change": -0.14,  "change_percent": -3.17,  "volume": 55977000,  "avg_volume_3m": 49658000,  "market_cap": "17.451B", "pe_ratio": 214.04, "week_52_change_pct": -3.29,   "week_52_low": 3.36,   "week_52_high": 5.18   }
   ],
   "current_index": 0,
   "research_results": [],
   "analysis_results": [],
-  "recommendations": []
+  "recommendations": [],
+  "excel_path": null,
+  "email_summary": null
 }
