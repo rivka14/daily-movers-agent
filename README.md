@@ -126,4 +126,5 @@ The pipeline currently produces recommendations without measuring their quality 
 - **Regression suite** — store a small set of known inputs and their expected recommendation outputs so that model or prompt changes don't silently degrade quality.
 
 ### Other ideas
+- **Visual summary** — generate a chart-based digest (e.g. a bar chart of daily price changes, a color-coded heatmap of Buy/Hold/Sell recommendations) so that the daily output is glanceable without opening the full workbook. Could be rendered as a PNG image embedded in the `.txt` summary.
 - **Cost tracking** — log token usage per stock so the per-run cost is visible and can be optimised.
