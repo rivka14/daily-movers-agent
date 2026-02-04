@@ -3,9 +3,11 @@
 
 # Python
 /venv
+.venv/
 __pycache__/
 .pytest_cache/
 .benchmarks/
+*.egg-info/
 
 # Environment
 .env
@@ -15,9 +17,20 @@ CLAUDE.md
 .claude/
 docs/
 
-# Generated reports
+# UiPath
+.uipath/
+__uipath/
+.agent/
+bindings.json
+entry-points.json
+
+# Generated outputs
 *.xlsx
 daily_movers_summary_*.txt
+output.json
+output_live.json
+input_live.json
+agent.mermaid
 
 # Worktrees
 .worktrees/

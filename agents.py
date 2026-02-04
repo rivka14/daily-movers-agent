@@ -1,27 +1,18 @@
 import json
 
-from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
+from uipath_langchain.chat import UiPathChat
 
-load_dotenv()
-
-from state import AgentState, StockData
+from state import AnalysisResult, Recommendation, ResearchResult, State, StockData
 from tools import search
 
-llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
+llm = UiPathChat(model="gpt-4o-mini-2024-07-18", temperature=0.7)
 
 
-def _current_stock(state: AgentState) -> StockData:
-    """Return the stock dict at the current loop index."""
-    return state["stocks"][state["current_index"]]
+def _current_stock(state: State) -> StockData:
+    return state.stocks[state.current_index]
 
 
 def _parse_json(text: str) -> dict:
-    """Extract the first JSON object from an LLM response.
-
-    Handles the common case where the model wraps output in ```json … ``` fences.
-    Falls back to an empty dict on failure so the graph keeps running.
-    """
     stripped = text.strip()
     if stripped.startswith("```"):
         lines = stripped.split("\n")
@@ -33,90 +24,87 @@ def _parse_json(text: str) -> dict:
         return {}
 
 
-def research_node(state: AgentState) -> dict:
-    """Search for news about the current stock and return a ResearchResult."""
+async def research_node(state: State) -> State:
     stock = _current_stock(state)
-    query = f"{stock['ticker']} {stock['company_name']} stock news today"
-    raw_results = search.run(query)
+    query = f"{stock.ticker} {stock.company_name} stock news today"
+    raw_results = await search.arun(query)
 
     prompt = (
         f"You are a financial research assistant. Below are raw search results for "
-        f"{stock['ticker']} ({stock['company_name']}).\n\n"
+        f"{stock.ticker} ({stock.company_name}).\n\n"
         f"{raw_results}\n\n"
         f"Produce a JSON object with exactly these keys:\n"
-        f'  "ticker": "{stock["ticker"]}",\n'
+        f'  "ticker": "{stock.ticker}",\n'
         f'  "news_summary": "<2-3 sentence summary>",\n'
         f'  "key_events": ["<event1>", "<event2>", ...]\n\n'
         f"Return only the JSON object, no additional text."
     )
-    response = llm.invoke(prompt)
+    response = await llm.ainvoke(prompt)
     assert isinstance(response.content, str)
     parsed = _parse_json(response.content)
 
-    result = {
-        "ticker": parsed.get("ticker", stock["ticker"]),
-        "news_summary": parsed.get("news_summary", raw_results[:500]),
-        "key_events": parsed.get("key_events", []),
-    }
-    return {"research_results": [result]}
+    result = ResearchResult(
+        ticker=parsed.get("ticker", stock.ticker),
+        news_summary=parsed.get("news_summary", raw_results[:500]),
+        key_events=parsed.get("key_events", []),
+    )
+    return state.model_copy(update={"research_results": state.research_results + [result]})
 
 
-def analyst_node(state: AgentState) -> dict:
-    """Analyse sentiment and technical factors for the current stock."""
+async def analyst_node(state: State) -> State:
     stock = _current_stock(state)
-    research = state["research_results"][-1]
+    research = state.research_results[-1]
 
-    pe_str = f"{stock['pe_ratio']:.2f}" if stock["pe_ratio"] is not None else "N/A"
+    pe_str = f"{stock.pe_ratio:.2f}" if stock.pe_ratio is not None else "N/A"
     prompt = (
-        f"You are a financial analyst. Analyse the following data for {stock['ticker']} "
-        f"({stock['company_name']}).\n\n"
-        f"Price: ${stock['price']:.2f}  |  Change: ${stock['change']:+.2f} ({stock['change_percent']:+.2f}%)\n"
-        f"Volume: {stock['volume']:,}  |  Avg Vol (3M): {stock['avg_volume_3m']:,}\n"
-        f"Market Cap: {stock['market_cap']}  |  P/E (TTM): {pe_str}\n"
-        f"52-Week Range: ${stock['week_52_low']:.2f} – ${stock['week_52_high']:.2f}  |  52W Chg: {stock['week_52_change_pct']:+.2f}%\n\n"
-        f"News summary: {research['news_summary']}\n"
-        f"Key events: {research['key_events']}\n\n"
+        f"You are a financial analyst. Analyse the following data for {stock.ticker} "
+        f"({stock.company_name}).\n\n"
+        f"Price: ${stock.price:.2f}  |  Change: ${stock.change:+.2f} ({stock.change_percent:+.2f}%)\n"
+        f"Volume: {stock.volume:,}  |  Avg Vol (3M): {stock.avg_volume_3m:,}\n"
+        f"Market Cap: {stock.market_cap}  |  P/E (TTM): {pe_str}\n"
+        f"52-Week Range: ${stock.week_52_low:.2f} – ${stock.week_52_high:.2f}  |  52W Chg: {stock.week_52_change_pct:+.2f}%\n\n"
+        f"News summary: {research.news_summary}\n"
+        f"Key events: {research.key_events}\n\n"
         f"Produce a JSON object with exactly these keys:\n"
-        f'  "ticker": "{stock["ticker"]}",\n'
+        f'  "ticker": "{stock.ticker}",\n'
         f'  "technical_analysis": "<2-3 sentences on price action, volume, momentum, and valuation>",\n'
         f'  "sentiment": "<one of: positive, negative, neutral>"\n\n'
         f"Return only the JSON object, no additional text."
     )
-    response = llm.invoke(prompt)
+    response = await llm.ainvoke(prompt)
     assert isinstance(response.content, str)
     parsed = _parse_json(response.content)
 
-    result = {
-        "ticker": parsed.get("ticker", stock["ticker"]),
-        "technical_analysis": parsed.get("technical_analysis", "Analysis unavailable."),
-        "sentiment": parsed.get("sentiment", "neutral"),
-    }
-    return {"analysis_results": [result]}
+    result = AnalysisResult(
+        ticker=parsed.get("ticker", stock.ticker),
+        technical_analysis=parsed.get("technical_analysis", "Analysis unavailable."),
+        sentiment=parsed.get("sentiment", "neutral"),
+    )
+    return state.model_copy(update={"analysis_results": state.analysis_results + [result]})
 
 
-def strategist_node(state: AgentState) -> dict:
-    """Generate a Buy/Hold/Sell recommendation for the current stock."""
+async def strategist_node(state: State) -> State:
     stock = _current_stock(state)
-    analysis = state["analysis_results"][-1]
+    analysis = state.analysis_results[-1]
 
-    pe_str = f"{stock['pe_ratio']:.2f}" if stock["pe_ratio"] is not None else "N/A"
+    pe_str = f"{stock.pe_ratio:.2f}" if stock.pe_ratio is not None else "N/A"
     prompt = (
         f"You are a senior investment strategist. Based on the following analysis for "
-        f"{stock['ticker']} ({stock['company_name']}) make a recommendation.\n\n"
-        f"Price: ${stock['price']:.2f}  |  Change: ${stock['change']:+.2f} ({stock['change_percent']:+.2f}%)\n"
-        f"Market Cap: {stock['market_cap']}  |  P/E (TTM): {pe_str}\n"
-        f"52-Week Range: ${stock['week_52_low']:.2f} – ${stock['week_52_high']:.2f}  |  52W Chg: {stock['week_52_change_pct']:+.2f}%\n"
-        f"Volume: {stock['volume']:,}  |  Avg Vol (3M): {stock['avg_volume_3m']:,}\n\n"
-        f"Technical analysis: {analysis['technical_analysis']}\n"
-        f"Sentiment: {analysis['sentiment']}\n\n"
+        f"{stock.ticker} ({stock.company_name}) make a recommendation.\n\n"
+        f"Price: ${stock.price:.2f}  |  Change: ${stock.change:+.2f} ({stock.change_percent:+.2f}%)\n"
+        f"Market Cap: {stock.market_cap}  |  P/E (TTM): {pe_str}\n"
+        f"52-Week Range: ${stock.week_52_low:.2f} – ${stock.week_52_high:.2f}  |  52W Chg: {stock.week_52_change_pct:+.2f}%\n"
+        f"Volume: {stock.volume:,}  |  Avg Vol (3M): {stock.avg_volume_3m:,}\n\n"
+        f"Technical analysis: {analysis.technical_analysis}\n"
+        f"Sentiment: {analysis.sentiment}\n\n"
         f"Produce a JSON object with exactly these keys:\n"
-        f'  "ticker": "{stock["ticker"]}",\n'
+        f'  "ticker": "{stock.ticker}",\n'
         f'  "action": "<one of: Buy, Hold, Sell>",\n'
         f'  "reasoning": "<2-3 sentences justifying the recommendation, referencing valuation and momentum>",\n'
         f'  "confidence": <float between 0.0 and 1.0>\n\n'
         f"Return only the JSON object, no additional text."
     )
-    response = llm.invoke(prompt)
+    response = await llm.ainvoke(prompt)
     assert isinstance(response.content, str)
     parsed = _parse_json(response.content)
 
@@ -126,15 +114,14 @@ def strategist_node(state: AgentState) -> dict:
     except (TypeError, ValueError):
         confidence = 0.5
 
-    result = {
-        "ticker": parsed.get("ticker", stock["ticker"]),
-        "action": parsed.get("action", "Hold"),
-        "reasoning": parsed.get("reasoning", "Insufficient data for a recommendation."),
-        "confidence": confidence,
-    }
-    return {"recommendations": [result]}
+    result = Recommendation(
+        ticker=parsed.get("ticker", stock.ticker),
+        action=parsed.get("action", "Hold"),
+        reasoning=parsed.get("reasoning", "Insufficient data for a recommendation."),
+        confidence=confidence,
+    )
+    return state.model_copy(update={"recommendations": state.recommendations + [result]})
 
 
-def supervisor_node(state: AgentState) -> dict:
-    """Increment current_index to advance to the next stock."""
-    return {"current_index": state["current_index"] + 1}
+async def supervisor_node(state: State) -> State:
+    return state.model_copy(update={"current_index": state.current_index + 1})
