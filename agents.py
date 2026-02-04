@@ -1,16 +1,14 @@
 import json
-import warnings
 
-from langchain_google_vertexai import ChatVertexAI
+from dotenv import load_dotenv
+from langchain_google_genai import ChatGoogleGenerativeAI
 
-warnings.filterwarnings("ignore", message=".*ChatVertexAI.*deprecated.*")
+load_dotenv()
 
 from state import AgentState, StockData
 from tools import search
 
-llm = ChatVertexAI(
-    model="gemini-2.0-flash",
-)
+llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash")
 
 
 def _current_stock(state: AgentState) -> StockData:
